@@ -1,0 +1,10 @@
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\bin\Debug\VoronoiDiagram.exe.config
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\bin\Debug\VoronoiDiagram.exe
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\bin\Debug\VoronoiDiagram.pdb
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csproj.AssemblyReference.cache
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.Form1.resources
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.Properties.Resources.resources
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csproj.GenerateResource.cache
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csproj.CoreCompileInputs.cache
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.exe
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.pdb
