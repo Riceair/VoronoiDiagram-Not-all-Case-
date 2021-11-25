@@ -29,12 +29,14 @@ namespace VoronoiDiagram
 
     public class Edge: Object
     {
-        public List<PointF> edge_points = new List<PointF>(); //紀錄邊的兩點
-        public List<PointF> points = new List<PointF>(); //製作該edge的兩點
+        public PointF edgePA, edgePB; //紀錄邊的兩點
+        public PointF pointA, pointB; //製作該edge的兩點
 
-        public Edge(List<PointF> edge_points, List<PointF> points){
-            this.edge_points = edge_points;
-            this.points = points;
+        public Edge(PointF edgePA, PointF edgePB, PointF pointA, PointF pointB){
+            this.edgePA = edgePA;
+            this.edgePB = edgePB;
+            this.pointA = pointA;
+            this.pointB = pointB;
         }
     }
 }

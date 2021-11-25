@@ -88,7 +88,7 @@ namespace VoronoiDiagram
             PointEdgeRecoder pointEdgeRecoder = diagramCalculator.run(points_list);
             foreach(Edge edge in pointEdgeRecoder.getEdges())
             {
-                DrawLine(edge.edge_points[0], edge.edge_points[1]);
+                DrawLine(edge.edgePA, edge.edgePB);
             }
         }
 
@@ -120,7 +120,7 @@ namespace VoronoiDiagram
             PointF p = new PointF(e.X, e.Y); //取得當前event的X,Y
             points_list.Add(p); //記錄到list中
             DrawPointF(p); //畫點
-            textBox1.AppendText("("+p.X+", "+convertAxisY(p.Y)+")\r\n");
+            textBox1.AppendText("("+p.X+", "+p.Y+")\r\n"); //convertAxisY(p.Y)
         }
 
         private void DrawPointF(PointF pointF){ //畫點
