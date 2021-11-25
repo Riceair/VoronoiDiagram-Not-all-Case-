@@ -33,12 +33,12 @@ namespace VoronoiDiagram
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.inputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.outputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.nextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -68,16 +68,23 @@ namespace VoronoiDiagram
             // inputToolStripMenuItem
             // 
             this.inputToolStripMenuItem.Name = "inputToolStripMenuItem";
-            this.inputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.inputToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.inputToolStripMenuItem.Text = "input";
             this.inputToolStripMenuItem.Click += new System.EventHandler(this.inputToolStripMenuItem_Click);
             // 
             // outputToolStripMenuItem
             // 
             this.outputToolStripMenuItem.Name = "outputToolStripMenuItem";
-            this.outputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.outputToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.outputToolStripMenuItem.Text = "output";
             this.outputToolStripMenuItem.Click += new System.EventHandler(this.outputToolStripMenuItem_Click);
+            // 
+            // nextToolStripMenuItem
+            // 
+            this.nextToolStripMenuItem.Name = "nextToolStripMenuItem";
+            this.nextToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
+            this.nextToolStripMenuItem.Text = "next";
+            this.nextToolStripMenuItem.Click += new System.EventHandler(this.nextToolStripMenuItem_Click);
             // 
             // stepToolStripMenuItem
             // 
@@ -114,13 +121,6 @@ namespace VoronoiDiagram
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(104, 630);
             this.textBox1.TabIndex = 3;
-            // 
-            // nextToolStripMenuItem
-            // 
-            this.nextToolStripMenuItem.Name = "nextToolStripMenuItem";
-            this.nextToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
-            this.nextToolStripMenuItem.Text = "next";
-            this.nextToolStripMenuItem.Click += new System.EventHandler(this.nextToolStripMenuItem_Click);
             // 
             // Form1
             // 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -20,7 +21,7 @@ namespace VoronoiDiagram
         private bool isReadOnly = false; //是否可以從畫布加點(true表示只能讀，不能加點)
         private bool isRunAll = false; //是否按全部執行
         private static int POINT_SIZE = 6; //點大小
-        private static int LINE_WIDTH = 2; //線寬度
+        private static int LINE_WIDTH = 1; //線寬度
         Graphics graphics;
         Bitmap bmp;
 
@@ -125,7 +126,7 @@ namespace VoronoiDiagram
 
         private void DrawPointF(PointF pointF){ //畫點
             Brush brush = new SolidBrush(Color.Red); //設定brush
-            RectangleF rectangleF = new RectangleF(pointF.X, pointF.Y, POINT_SIZE, POINT_SIZE); //畫長方形(由於初始化設定，畫出來是圓)
+            RectangleF rectangleF = new RectangleF(pointF.X-3, pointF.Y-3, POINT_SIZE, POINT_SIZE); //畫長方形(由於初始化設定，畫出來是圓)
             graphics.FillEllipse(brush, rectangleF); //在graphic上作畫(會畫在bmp上)
             pictureBox1.Image = bmp; //pictureBox更新bmp
         }

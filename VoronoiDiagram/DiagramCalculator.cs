@@ -44,7 +44,11 @@ namespace VoronoiDiagram
                 }
                 else{ //若有3個點
                     //外心為3中垂線交點(找2個中垂線交點即可)
-                    point_edge  = new PointEdgeRecoder(pList);
+                    if(calMath.is3ALine(pList[0], pList[1], pList[2])){ //檢查是否三點共線
+                        eList.Add(calMath.getEdge(pList[0], pList[1])); //三點共線直接加入兩個邊
+                        eList.Add(calMath.getEdge(pList[1], pList[2]));
+                    }
+                    point_edge  = new PointEdgeRecoder(pList, eList);
                 }
 
                 recoder_buffer.Add(point_edge); //記錄到buffer中

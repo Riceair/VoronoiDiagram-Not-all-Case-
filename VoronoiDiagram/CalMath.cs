@@ -25,13 +25,16 @@ namespace VoronoiDiagram
         }
         public PointF getVerticalVec(PointF vector){ //取得輸入向量對應的垂直向量
             //兩向量若垂直內積會是0
-            //vector(x,y) vertical vector(y,-x) -> x*y+y*(-x) = 0
-            return new PointF(vector.Y, -vector.X);
+            //vector(x,y) vertical vector(-y,x) -> x*(-y)+y*x = 0
+            return new PointF(-vector.Y, vector.X);
+        }
+        public float getInnerProduct(PointF vec1, PointF vec2){
+            return vec1.X*vec2.X + vec1.Y*vec2.Y;
         }
         public Edge getEdge(PointF point1, PointF point2){ //取得兩點之中垂線
             PointF mid = getCenterPoint(point1, point2); //取得兩點之中點
             //取得兩方向之垂直向量
-            PointF verticalVec1 = getVerticalVec(getVector(point1, point2)); //取得兩點之垂直向量
+            PointF verticalVec1 = getVerticalVec(getVector(point1, point2)); //取得兩方向之垂直向量
             PointF verticalVec2 = getVerticalVec(getVector(point2, point1));
             return new Edge(addPoints(mid, multPoints(verticalVec1, max_number)), addPoints(mid, multPoints(verticalVec2, max_number)), point1, point2);
         }
@@ -39,6 +42,13 @@ namespace VoronoiDiagram
             float x = (point1.X + point2.X)/2;
             float y = (point1.Y + point2.Y)/2;
             return new PointF(x, y);
+        }
+
+        public bool is3ALine(PointF point1, PointF point2, PointF point3){ //檢查是否三點共線
+            //若三點共線，1-2線段 和 2-3線段的法向量 的內積為0
+            if (getInnerProduct(getVector(point1, point2), getVerticalVec(getVector(point2, point3))) == 0)
+                return true;
+            else return false;
         }
 
         // int cross(Vector v1, Vector v2)
