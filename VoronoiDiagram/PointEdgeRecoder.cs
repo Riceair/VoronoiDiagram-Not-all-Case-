@@ -6,8 +6,8 @@ namespace VoronoiDiagram
 {
     public class PointEdgeRecoder: Object
     {
-        private List<PointF> points_list = new List<PointF>();
-        private List<Edge> edges_list = new List<Edge>();
+        public List<PointF> points_list = new List<PointF>();
+        public List<Edge> edges_list = new List<Edge>();
 
         public PointEdgeRecoder(List<PointF> pList, List<Edge> eList){
             points_list = pList;
@@ -16,14 +16,6 @@ namespace VoronoiDiagram
 
         public PointEdgeRecoder(List<PointF> pList){
             points_list = pList;
-        }
-
-        public List<PointF> getPoints(){
-            return points_list;
-        }
-
-        public List<Edge> getEdges(){
-            return edges_list;
         }
     }
 
@@ -37,6 +29,11 @@ namespace VoronoiDiagram
             this.edgePB = edgePB;
             this.pointA = pointA;
             this.pointB = pointB;
+        }
+
+        public Edge(PointF edgePA, PointF edgePB){
+            this.edgePA = edgePA;
+            this.edgePB = edgePB;
         }
     }
 }

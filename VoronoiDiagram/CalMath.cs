@@ -19,17 +19,48 @@ namespace VoronoiDiagram
             pList = pList.OrderBy(A => A.X).ThenBy(B => B.Y).ToList();
             return pList;
         }
+        public List<Edge> getSortEdges(List<Edge> eList){ //排序edge
+            foreach(Edge edge in eList){ //先排序單一邊的兩點
+                if(edge.edgePA.X > edge.edgePB.X || (edge.edgePA.X == edge.edgePB.X && edge.edgePA.Y > edge.edgePB.Y)){
+                    PointF tmp = edge.edgePB;
+                    edge.edgePB = edge.edgePA;
+                    edge.edgePA = tmp;
+                }
+            }
+
+            eList = eList.OrderBy(A => A.edgePA.X).ThenBy(B => B.edgePB.X).ThenBy(C => C.edgePA.Y).ThenBy(D => D.edgePB.Y).ToList();
+            return eList;
+        }
+
+        public List<PointF> getCounterClockwiseSortPoints(List<PointF> pList){ //取得逆時鐘排好的點
+            List<PointF> pList_sort = new List<PointF>(pList); //複製List
+            PointF center = getCenterPoint(pList);
+
+            for(int i=0;i<pList_sort.Count;i++){ //利用bubble sort排序
+                for(int j=0;j<pList_sort.Count-i-1;j++){
+                    if(getCrossProduct(center, pList_sort[j], pList_sort[j+1])>0){
+                        PointF tmp = pList_sort[j];
+                        pList_sort[j] = pList_sort[j+1];
+                        pList_sort[j+1] = tmp;
+                    }
+                }
+            }
+            return pList_sort;
+        }
         
         public PointF getVector(PointF point1, PointF point2){ //取得向量
             return new PointF(point2.X - point1.X, point2.Y - point1.Y);
         }
         public PointF getVerticalVec(PointF vector){ //取得輸入向量對應的垂直向量
             //兩向量若垂直內積會是0
-            //vector(x,y) vertical vector(-y,x) -> x*(-y)+y*x = 0
+            //vector(x,y) vertical vector(-y,x) -> x*(-y)+y*x = 0 方向依照負號在的位置不同
             return new PointF(-vector.Y, vector.X);
         }
         public float getInnerProduct(PointF vec1, PointF vec2){
             return vec1.X*vec2.X + vec1.Y*vec2.Y;
+        }
+        public float getCrossProduct(PointF center, PointF point1, PointF point2){ //差積，若小於0表示point1對於point2是順時鐘
+            return (point1.X-center.X)*(point2.Y-center.Y) - (point1.Y-center.Y)*(point2.X-center.X);
         }
         public Edge getEdge(PointF point1, PointF point2){ //取得兩點之中垂線
             PointF mid = getCenterPoint(point1, point2); //取得兩點之中點
@@ -42,6 +73,16 @@ namespace VoronoiDiagram
             float x = (point1.X + point2.X)/2;
             float y = (point1.Y + point2.Y)/2;
             return new PointF(x, y);
+        }
+
+        public PointF getCenterPoint(List<PointF> pList){ //算中心點
+            float x = 0;
+            float y = 0;
+            foreach(PointF point in pList){
+                x += point.X;
+                y += point.Y;
+            }
+            return new PointF(x/pList.Count, y/pList.Count);
         }
 
         public bool is3ALine(PointF point1, PointF point2, PointF point3){ //檢查是否三點共線
@@ -63,15 +104,15 @@ namespace VoronoiDiagram
         //     // 計算交點
         //     return a1 + a * cross(s, b) / cross(a, b);
         // }
-        public PointF getIntersection(List<PointF> pList1, List<PointF> pList2){ //找兩線交點
-            PointF a = new PointF(pList1[1].X-pList1[0].X, pList1[1].Y-pList1[0].Y);
-            PointF b = new PointF(pList2[1].X-pList2[0].X, pList2[1].Y-pList2[0].Y);
-            PointF s = new PointF(pList2[0].X-pList1[0].X, pList2[0].Y-pList1[0].Y);
+        public PointF getIntersection(Edge edge1, Edge edge2){ //找兩線交點
+            PointF a = new PointF(edge1.edgePB.X-edge1.edgePA.X, edge1.edgePB.Y-edge1.edgePA.Y);
+            PointF b = new PointF(edge2.edgePB.X-edge2.edgePA.X, edge2.edgePB.Y-edge2.edgePA.Y);
+            PointF s = new PointF(edge2.edgePA.X-edge1.edgePA.X, edge2.edgePA.Y-edge1.edgePA.Y);
             float cross_sb = s.X*b.Y - s.Y*b.X;
             float cross_ab = a.X*b.Y - a.Y*b.X;
             a.X = a.X*cross_sb/cross_ab;
             a.Y = a.Y*cross_sb/cross_ab;
-            return new PointF(pList1[0].X+a.X, pList1[0].Y+a.Y);
+            return new PointF(edge1.edgePA.X+a.X, edge1.edgePA.Y+a.Y);
         }
         public float getPointDistance(PointF point1, PointF point2){ //運算兩點距離
             return (float)Math.Sqrt(Math.Pow(point1.X-point2.X,2)+Math.Pow(point1.Y-point2.Y,2));
