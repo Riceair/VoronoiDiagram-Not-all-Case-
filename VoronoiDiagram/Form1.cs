@@ -15,6 +15,8 @@ namespace VoronoiDiagram
     public partial class Form1 : Form
     {
         private Queue<List<PointF>> points_list_buffer = new Queue<List<PointF>>(); //儲存input分次的點
+        private List<PointEdgeRecoder> record_buffer = new List<PointEdgeRecoder>();
+        private int buffer_idx = 0;
         private List<PointF> points_list = new List<PointF>(); //儲存要處理的points
         private List<string> input_lines = new List<string>(); //儲存讀檔後的每一列
         private DiagramCalculator diagramCalculator; //運算Voroni Diagram的物件
@@ -155,13 +157,32 @@ namespace VoronoiDiagram
             }
         }
 
+        private void stepToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(buffer_idx>=record_buffer.Count()) return;
+            if(!isRunAll){
+                isReadOnly = true;
+                isRunAll = true;
+                result_recod = diagramCalculator.run(points_list);
+                record_buffer = diagramCalculator.getRecoderBuffer();
+                textBox1.AppendText(""+result_recod);
+            }
+            clear();
+            DrawListPoints();
+            PointEdgeRecoder record = record_buffer[buffer_idx];
+            foreach(Edge edge in record.edges_list)
+                DrawLine(edge.edgePA, edge.edgePB);
+            buffer_idx++;
+        }
         private void runToolStripMenuItem_Click(object sender, EventArgs e) //跑執行全部
         {
             isReadOnly = true;
             isRunAll = true;
+            buffer_idx = 0;
             clear();
             DrawListPoints();
             result_recod = diagramCalculator.run(points_list);
+            record_buffer = diagramCalculator.getRecoderBuffer();
             foreach(Edge edge in result_recod.edges_list)
                 DrawLine(edge.edgePA, edge.edgePB);
         }
@@ -171,6 +192,7 @@ namespace VoronoiDiagram
             points_list.Clear(); //清空紀錄的point
             isReadOnly = false;
             isRunAll = false;
+            buffer_idx = 0;
             clear();
         }
 

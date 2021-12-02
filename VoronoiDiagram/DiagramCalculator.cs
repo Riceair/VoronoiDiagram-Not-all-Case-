@@ -74,5 +74,9 @@ namespace VoronoiDiagram
                 return new PointEdgeRecoder(pList);
             }
         }
+
+        public List<PointEdgeRecoder> getRecoderBuffer(){
+            return recoder_buffer;
+        }
     }
 }
