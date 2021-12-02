@@ -159,14 +159,14 @@ namespace VoronoiDiagram
 
         private void stepToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(buffer_idx>=record_buffer.Count()) return;
             if(!isRunAll){
                 isReadOnly = true;
                 isRunAll = true;
                 result_recod = diagramCalculator.run(points_list);
                 record_buffer = diagramCalculator.getRecoderBuffer();
-                textBox1.AppendText(""+result_recod);
             }
+            if(buffer_idx>=record_buffer.Count()) return;
+            
             clear();
             DrawListPoints();
             PointEdgeRecoder record = record_buffer[buffer_idx];
