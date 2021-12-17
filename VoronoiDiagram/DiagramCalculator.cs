@@ -98,6 +98,14 @@ namespace VoronoiDiagram
                 right_PE.convex_list = ch_lower;
                 addToBuffer(left_PE, right_PE);
 
+                Edge hyper_edge = calMath.getPointDiffSideEdge(ch_upper, left_PE.points_list); //Convex Hull上方橫跨左右側的邊
+                Edge bottom_edge = calMath.getPointDiffSideEdge(ch_lower, left_PE.points_list); //Convex Hull下方橫跨左右側的邊
+
+                List<Edge> eL = new List<Edge>();
+                eL.Add(hyper_edge);
+                //eL.Add(bottom_edge);
+                all_PE.convex_list = eL;
+                addToBuffer(all_PE);
                 return all_PE;
             }
         }

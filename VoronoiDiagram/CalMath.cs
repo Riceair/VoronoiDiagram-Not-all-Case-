@@ -93,6 +93,32 @@ namespace VoronoiDiagram
             return convex_eList;
         }
 
+        public Edge getPointDiffSideEdge(List<Edge> ch_edges, List<PointF> points){ //只要檢查出一點在左，一點不在左即可
+            int edge_idx = -1;
+            for(int i = 0;i<ch_edges.Count;i++){
+                bool isPAFind = false, isPBFind = false;
+                foreach(PointF point in points){
+                    if(ch_edges[i].edgePA.Equals(point)){ //edgePA在左側
+                        isPAFind = true;
+                        break;
+                    }
+                }
+
+                foreach(PointF point in points){
+                    if(ch_edges[i].edgePB.Equals(point)){ //edgePB在左側
+                        isPBFind = true;
+                        break;
+                    }
+                }
+
+                if((isPAFind&&!isPBFind) || (!isPAFind&&isPBFind)){ //一點有找到，一點沒找到
+                    edge_idx = i;
+                    break;
+                }
+            }
+            return ch_edges[edge_idx];
+        }
+
         public List<PointF> getCounterClockwiseSortPoints(List<PointF> pList){ //取得逆時鐘排好的點
             List<PointF> pList_sort = new List<PointF>(pList); //複製List
             PointF center = getCenterPoint(pList);
