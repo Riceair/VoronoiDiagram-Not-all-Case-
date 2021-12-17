@@ -8,6 +8,10 @@ namespace VoronoiDiagram
     {
         public List<PointF> points_list = new List<PointF>();
         public List<Edge> edges_list = new List<Edge>();
+        public List<Edge> convex_list = new List<Edge>();
+        public Color point_color = Color.DarkGray;
+        public Color edge_color = Color.Gray;
+        public Color convex_color = Color.SkyBlue;
 
         public PointEdgeRecoder(List<PointF> pList, List<Edge> eList){
             points_list = pList;
@@ -16,6 +20,10 @@ namespace VoronoiDiagram
 
         public PointEdgeRecoder(List<PointF> pList){
             points_list = pList;
+        }
+
+        public Object getClone(){
+            return this.MemberwiseClone();
         }
     }
 

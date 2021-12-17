@@ -32,6 +32,67 @@ namespace VoronoiDiagram
             return eList;
         }
 
+        //參考演算法筆記Andrew's Monotone Chain
+        public List<Edge> getConvexHull(List<PointF> pList){ //取得Convex Hull的edge
+            List<PointF> sort_pList = getSortPoints(pList);
+            int count = sort_pList.Count; //所有點的數量
+            PointF[] upper_points = new PointF[count]; //Convex Hull上凸包
+            PointF[] lower_points = new PointF[count]; //Convex Hull下凸包
+            
+            int l = 0, u = 0; //Convex Hull上下凸包個數
+            for(int i = 0; i<count;i++){
+                while(l >= 2 && getCrossProduct(lower_points[l-2], lower_points[l-1], sort_pList[i]) <= 0)
+                    l--;
+                while(u >= 2 && getCrossProduct(upper_points[u-2], upper_points[u-1], sort_pList[i]) >= 0)
+                    u--;
+                lower_points[l++] = pList[i];
+                upper_points[u++] = pList[i];
+            }
+
+            List<Edge> convex_eList = new List<Edge>();
+            for(int i=0;i<l-1;i++)
+                convex_eList.Add(new Edge(lower_points[i], lower_points[i+1]));
+            for(int i=0; i<u-1;i++)
+                convex_eList.Add(new Edge(upper_points[i], upper_points[i+1]));
+            return convex_eList;
+        }
+
+        public List<Edge> getConvexUpper(List<PointF> pList){ //取得Convex Hull的上凸包
+            List<PointF> sort_pList = getSortPoints(pList);
+            int count = sort_pList.Count; //所有點的數量
+            PointF[] upper_points = new PointF[count]; //Convex Hull上凸包
+            
+            int l = 0, u = 0; //Convex Hull上下凸包個數
+            for(int i = 0; i<count;i++){
+                while(u >= 2 && getCrossProduct(upper_points[u-2], upper_points[u-1], sort_pList[i]) >= 0)
+                    u--;
+                upper_points[u++] = pList[i];
+            }
+
+            List<Edge> convex_eList = new List<Edge>();
+            for(int i=0; i<u-1;i++)
+                convex_eList.Add(new Edge(upper_points[i], upper_points[i+1]));
+            return convex_eList;
+        }
+
+        public List<Edge> getConvexLower(List<PointF> pList){ //取得Convex Hull的上凸包
+            List<PointF> sort_pList = getSortPoints(pList);
+            int count = sort_pList.Count; //所有點的數量
+            PointF[] lower_points = new PointF[count]; //Convex Hull下凸包
+            
+            int l = 0, u = 0; //Convex Hull上下凸包個數
+            for(int i = 0; i<count;i++){
+                while(l >= 2 && getCrossProduct(lower_points[l-2], lower_points[l-1], sort_pList[i]) <= 0)
+                    l--;
+                lower_points[l++] = pList[i];
+            }
+
+            List<Edge> convex_eList = new List<Edge>();
+            for(int i=0;i<l-1;i++)
+                convex_eList.Add(new Edge(lower_points[i], lower_points[i+1]));
+            return convex_eList;
+        }
+
         public List<PointF> getCounterClockwiseSortPoints(List<PointF> pList){ //取得逆時鐘排好的點
             List<PointF> pList_sort = new List<PointF>(pList); //複製List
             PointF center = getCenterPoint(pList);

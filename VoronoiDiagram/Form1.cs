@@ -15,8 +15,7 @@ namespace VoronoiDiagram
     public partial class Form1 : Form
     {
         private Queue<List<PointF>> points_list_buffer = new Queue<List<PointF>>(); //儲存input分次的點
-        private List<PointEdgeRecoder> record_buffer = new List<PointEdgeRecoder>();
-        private int buffer_idx = 0;
+        private Queue<List<PointEdgeRecoder>> record_buffer = new Queue<List<PointEdgeRecoder>>();
         private List<PointF> points_list = new List<PointF>(); //儲存要處理的points
         private List<string> input_lines = new List<string>(); //儲存讀檔後的每一列
         private DiagramCalculator diagramCalculator; //運算Voroni Diagram的物件
@@ -159,32 +158,39 @@ namespace VoronoiDiagram
 
         private void stepToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(!isRunAll){
+            if(!isRunAll || record_buffer.Count == 0){
                 isReadOnly = true;
                 isRunAll = true;
                 result_recod = diagramCalculator.run(points_list);
                 record_buffer = diagramCalculator.getRecoderBuffer();
             }
-            if(buffer_idx>=record_buffer.Count()) return;
             
             clear();
             DrawListPoints();
-            PointEdgeRecoder record = record_buffer[buffer_idx];
-            foreach(Edge edge in record.edges_list)
-                DrawLine(edge.edgePA, edge.edgePB);
-            buffer_idx++;
+            List<PointEdgeRecoder> record_list = record_buffer.Dequeue();
+            foreach(PointEdgeRecoder record in record_list)
+            {
+                foreach(PointF point in record.points_list)
+                    DrawPointF(point, record.point_color);
+                foreach(Edge edge in record.edges_list)
+                    DrawLine(edge.edgePA, edge.edgePB, record.edge_color);
+                foreach(Edge edge in record.convex_list)
+                    DrawLine(edge.edgePA, edge.edgePB, record.convex_color);
+            }
         }
         private void runToolStripMenuItem_Click(object sender, EventArgs e) //跑執行全部
         {
             isReadOnly = true;
             isRunAll = true;
-            buffer_idx = 0;
+            record_buffer.Clear();
             clear();
             DrawListPoints();
             result_recod = diagramCalculator.run(points_list);
             record_buffer = diagramCalculator.getRecoderBuffer();
             foreach(Edge edge in result_recod.edges_list)
                 DrawLine(edge.edgePA, edge.edgePB);
+            foreach(Edge edge in result_recod.convex_list)
+                DrawLine(edge.edgePA, edge.edgePB, result_recod.convex_color);
         }
 
         private void reset(){
@@ -192,7 +198,7 @@ namespace VoronoiDiagram
             points_list.Clear(); //清空紀錄的point
             isReadOnly = false;
             isRunAll = false;
-            buffer_idx = 0;
+            record_buffer.Clear();
             clear();
         }
 
@@ -241,15 +247,28 @@ namespace VoronoiDiagram
         }
 
         private void DrawPointF(PointF pointF){ //畫點
-            Brush brush = new SolidBrush(Color.Red); //設定brush
+            Brush brush = new SolidBrush(Color.DarkGray); //設定brush
             RectangleF rectangleF = new RectangleF(pointF.X-3, pointF.Y-3, POINT_SIZE, POINT_SIZE); //畫長方形(由於初始化設定，畫出來是圓)
             graphics.FillEllipse(brush, rectangleF); //在graphic上作畫(會畫在bmp上)
             pictureBox1.Image = bmp; //pictureBox更新bmp
             textBox1.AppendText("("+pointF.X+", "+pointF.Y+")\r\n"); //convertAxisY(p.Y)
         }
 
+        private void DrawPointF(PointF pointF, Color color){ //畫點
+            Brush brush = new SolidBrush(color); //設定brush
+            RectangleF rectangleF = new RectangleF(pointF.X-3, pointF.Y-3, POINT_SIZE, POINT_SIZE); //畫長方形(由於初始化設定，畫出來是圓)
+            graphics.FillEllipse(brush, rectangleF); //在graphic上作畫(會畫在bmp上)
+            pictureBox1.Image = bmp; //pictureBox更新bmp
+        }
+
         private void DrawLine(PointF point1, PointF point2){ //畫線
-            Pen pen = new Pen(Color.Blue, LINE_WIDTH);
+            Pen pen = new Pen(Color.Gray, LINE_WIDTH);
+            graphics.DrawLine(pen, point1, point2);
+            pictureBox1.Image = bmp;
+        }
+
+        private void DrawLine(PointF point1, PointF point2, Color color){ //畫線
+            Pen pen = new Pen(color, LINE_WIDTH);
             graphics.DrawLine(pen, point1, point2);
             pictureBox1.Image = bmp;
         }

@@ -8,7 +8,7 @@ namespace VoronoiDiagram
 {
     public class DiagramCalculator: Object
     {
-        private List<PointEdgeRecoder> recoder_buffer = new List<PointEdgeRecoder>(); //紀錄執行步驟的buffer(以處理step模式)
+        private Queue<List<PointEdgeRecoder>> recoder_buffer = new Queue<List<PointEdgeRecoder>>(); //紀錄執行步驟的buffer(以處理step模式)
         private CalMath calMath; //數學公式的物件
         private float max_number;
         private TextBox textBox; //Debug
@@ -33,6 +33,7 @@ namespace VoronoiDiagram
 
         private PointEdgeRecoder runVoronoiDiagram(List<PointF> pList){ //遞迴
             int count = pList.Count; //紀錄當前的點個數
+
             if(count <= 3){ //直接做Voroni Diagram
                 PointEdgeRecoder point_edge;
                 List<Edge> eList = new List<Edge>();
@@ -65,18 +66,57 @@ namespace VoronoiDiagram
                     }
                     point_edge  = new PointEdgeRecoder(pList, eList);
                 }
-
-                recoder_buffer.Add(point_edge); //記錄到buffer中
-                return point_edge;
+                
+                point_edge.point_color = Color.Blue;
+                point_edge.edge_color = Color.LightBlue;
+                //存Buffer
+                addToBuffer(point_edge); //記錄到buffer中
+                return (PointEdgeRecoder) point_edge.getClone(); //用clone的物件
             }
             else{
-                textBox.AppendText("尚無法處理大於三個的情況");
-                return new PointEdgeRecoder(pList);
+                //左右兩邊分別跑VoronoiDiagram遞迴
+                PointEdgeRecoder left_PE = runVoronoiDiagram(pList.GetRange(0, pList.Count/2));
+                PointEdgeRecoder right_PE = runVoronoiDiagram(pList.GetRange(pList.Count/2, pList.Count - pList.Count/2));
+
+                //存Buffer
+                //取得左右邊的convex hull
+                left_PE.edge_color = Color.DarkBlue;
+                right_PE.edge_color = Color.Orange;
+                left_PE.convex_list = calMath.getConvexHull(left_PE.points_list);
+                right_PE.convex_list = calMath.getConvexHull(right_PE.points_list);
+                addToBuffer(left_PE, right_PE); //記錄到buffer中
+                
+                //對所有的點找Convex Hull
+                PointEdgeRecoder all_PE = new PointEdgeRecoder(new List<PointF>(left_PE.points_list)); //先複製左半部的點
+                all_PE.points_list.AddRange(right_PE.points_list); //再將右半部的點複製加入
+                List<Edge> ch_upper = calMath.getConvexUpper(all_PE.points_list); //找Convex Hull上包
+                List<Edge> ch_lower = calMath.getConvexLower(all_PE.points_list); //找Convex Hull下包
+
+                //存Buffer
+                //針對找到所有Convex Hull存入buffer(為了顯示左右側，因此加入的是左右側的recoder)
+                left_PE.convex_list = ch_upper;
+                right_PE.convex_list = ch_lower;
+                addToBuffer(left_PE, right_PE);
+
+                return all_PE;
             }
         }
 
-        public List<PointEdgeRecoder> getRecoderBuffer(){
+        public Queue<List<PointEdgeRecoder>> getRecoderBuffer(){
             return recoder_buffer;
+        }
+
+        private void addToBuffer(PointEdgeRecoder recoder){
+            List<PointEdgeRecoder> PE_recoder = new List<PointEdgeRecoder>();
+            PE_recoder.Add((PointEdgeRecoder) recoder.getClone());
+            recoder_buffer.Enqueue(PE_recoder);
+        }
+
+        private void addToBuffer(PointEdgeRecoder recoder1, PointEdgeRecoder recoder2){
+            List<PointEdgeRecoder> PE_recoder = new List<PointEdgeRecoder>();
+            PE_recoder.Add((PointEdgeRecoder) recoder1.getClone());
+            PE_recoder.Add((PointEdgeRecoder) recoder2.getClone());
+            recoder_buffer.Enqueue(PE_recoder);
         }
     }
 }
