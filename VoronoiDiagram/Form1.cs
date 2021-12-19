@@ -149,6 +149,7 @@ namespace VoronoiDiagram
             {
                 clear();
                 points_list = points_list_buffer.Dequeue();
+                record_buffer.Clear();
                 DrawListPoints();
             }
             else{
@@ -176,6 +177,8 @@ namespace VoronoiDiagram
                     DrawLine(edge.edgePA, edge.edgePB, record.edge_color);
                 foreach(Edge edge in record.convex_list)
                     DrawLine(edge.edgePA, edge.edgePB, record.convex_color);
+                foreach(Edge edge in record.hyper_list)
+                    DrawLine(edge.edgePA, edge.edgePB, record.hyper_color);
             }
         }
         private void runToolStripMenuItem_Click(object sender, EventArgs e) //跑執行全部
