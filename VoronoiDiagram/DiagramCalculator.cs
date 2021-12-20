@@ -184,7 +184,16 @@ namespace VoronoiDiagram
 
                     PointF intersection;
                     int end_side = 0; //若結束點又再碰到線，紀錄碰到哪邊的線
-                    if(left_intersection.Y > right_intersection.Y || last_side==2){ //判斷先交右側還是左側
+                    if(left_intersection.Equals(right_intersection)){
+                        intersection = left_intersection;
+                        if(!current_left.Equals(end_left)){
+                            current_left = left_first.pointB;
+                        }
+                        if(!current_right.Equals(end_right)){
+                            current_right = right_first.pointB;
+                        }
+                    }
+                    else if(left_intersection.Y > right_intersection.Y || last_side==2){ //判斷先交右側還是左側
                         intersection = left_intersection;
                         if(!current_left.Equals(end_left)){ //左側找到結束點(不用再交換了)
                             current_left = left_first.pointB;
@@ -252,7 +261,7 @@ namespace VoronoiDiagram
 
                     Console.WriteLine("左交點: "+left_intersection);
                     Console.WriteLine("右交點: "+right_intersection);
-                    Console.WriteLine("Edge Point:"+left_first.pointA+left_first.pointB);
+                    Console.WriteLine("Edge PointAB:"+left_first.pointA+left_first.pointB);
                     Console.WriteLine("交點:"+intersection);
                     Console.WriteLine("Current left:"+current_left);
                     Console.WriteLine("Current right:"+current_right);
