@@ -41,6 +41,9 @@ namespace VoronoiDiagram
 
             diagramCalculator = new DiagramCalculator(pictureBox1.Width);
             diagramCalculator.setTextBox(textBox1); //Debug
+
+            //C#的垃圾BUG 以下行畫不出來
+            //DrawLine(new PointF((float)150.0039, 150), new PointF(150, -62900));
         }
 
         private void inputToolStripMenuItem_Click(object sender, EventArgs e) //開input檔案

@@ -98,14 +98,14 @@ namespace VoronoiDiagram
                 right_PE.convex_list = ch_lower;
                 addToBuffer(left_PE, right_PE);
 
-                Edge convex_upper_line = calMath.getPointDiffSideEdge(ch_upper, left_PE.points_list); //Convex Hull上方橫跨左右側的邊
-                Edge convex_lower_line = calMath.getPointDiffSideEdge(ch_lower, left_PE.points_list); //Convex Hull下方橫跨左右側的邊
+                Edge convex_upper_line = calMath.getPointDiffSideEdge(ch_upper, left_PE.points_list, right_PE.points_list); //Convex Hull上方橫跨左右側的邊
+                Edge convex_lower_line = calMath.getPointDiffSideEdge(ch_lower, left_PE.points_list, right_PE.points_list); //Convex Hull下方橫跨左右側的邊
 
                 Edge hyper_voronoi_edge = calMath.getVoronoiEdge(convex_upper_line.edgePA, convex_upper_line.edgePB); //取得hyper edge
                 //複製左側的邊
-                List<Edge> left_edges = left_PE.edges_list.ConvertAll(edge => new Edge(edge.edgePA, edge.edgePB, edge.pointA, edge.pointB));
+                List<Edge> left_edges = left_PE.edges_list.ConvertAll(edge => (Edge) edge.getClone());
                 //複製右側的邊
-                List<Edge> right_edges = right_PE.edges_list.ConvertAll(edge => new Edge(edge.edgePA, edge.edgePB, edge.pointA, edge.pointB));
+                List<Edge> right_edges = right_PE.edges_list.ConvertAll(edge => (Edge) edge.getClone());
 
                 PointF start_left, start_right, end_left, end_right; //儲存merge的左右邊開始結束點
                  //確定start/end point左右側是真的存左右側
@@ -128,100 +128,152 @@ namespace VoronoiDiagram
 
                 PointF current_left = start_left, current_right = start_right;
                 Edge current_edge = hyper_voronoi_edge;
+                List<Edge> remove_edge = new List<Edge>(); //儲存已經處理過的Edge
 
-                bool isInit = true;
-                while(true){
-                    List<Edge> left_remove_edge = new List<Edge>();
-                    Edge left_first = null; //紀錄hyper plane第一個碰到的edge
+                //畫hyper plane
+                bool endFlag = false; //標記結束
+                int last_side = 0; //紀錄上一次是碰到哪一邊
+
+                for(int c=0;c<pList.Count;c++){ //用所有點的數當迴圈數，避免bug卡住
+                    if(current_left.Equals(end_left) && current_right.Equals(end_right)){
+                        all_PE.hyper_list.Add((Edge)current_edge.getClone());
+                        endFlag = true;
+                    }
+
+                    Edge left_first = new Edge(); //紀錄hyper plane第一個碰到的edge
                     PointF left_intersection = new PointF(); //紀錄交點
-                    foreach(Edge edge in left_edges){
-                        if(edge.pointA.Equals(current_left) || (edge.pointB.Equals(current_left)&&isInit)){
-                            if(left_first==null){
+                    foreach(Edge edge in left_edges){ //找到左側第一個碰到的edge
+                        if(last_side==1) break; //上一次是左側，本次不會是左側
+
+                        if(edge.pointA.Equals(current_left) || (edge.pointB.Equals(current_left)&&endFlag)){ //全部找一遍
+                            PointF edge_intersection = calMath.getIntersection(edge, current_edge);
+                            if(edge_intersection.Y > Math.Max(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
+                                continue;
+                            if(edge_intersection.Y < Math.Min(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
+                                continue;
+                            if(edge_intersection.Y > current_edge.edgePA.Y) //找到回頭點，跳過
+                                continue;
+
+                            if(edge_intersection.Y > left_intersection.Y){
                                 left_first = edge;
-                                left_intersection = calMath.getIntersection(edge, current_edge);
-                            }
-                            else{
-                                PointF edge_intersection = calMath.getIntersection(edge, current_edge);
-                                if(edge_intersection.Y > left_intersection.Y){
-                                    left_first = edge;
-                                    left_intersection = edge_intersection;
-                                }
+                                left_intersection = edge_intersection;
                             }
                         }
                     }
 
-                    // if(!calMath.isIntersection(edge, current_edge)){ //兩線段沒有相交
-                    //         // if(Math.Min(current_edge.edgePA.X, current_edge.edgePB.X)<Math.Min(edge.edgePA.X, edge.edgePB.X) //線完全在hyper plane右上方(要完全去除)
-                    //         // && Math.Min(current_edge.edgePA.Y, current_edge.edgePB.Y)<Math.Min(edge.edgePA.Y, edge.edgePB.Y)
-                    //         // ) left_remove_edge.Add(edge);
-                    //         left_remove_edge.Add(edge);
-                    //     }
-                    // foreach(Edge edge in left_remove_edge){
-                    //     left_edges.Remove(edge);
-                    // }
-
-                    List<Edge> right_remove_edge = new List<Edge>();
-                    Edge right_first = null; //紀錄hyper plane第一個碰到的edge
+                    Edge right_first = new Edge(); //紀錄hyper plane第一個碰到的edge
                     PointF right_intersection = new PointF(); //紀錄交點
-                    foreach(Edge edge in right_edges){
-                        if(edge.pointA.Equals(current_right) || (edge.pointB.Equals(current_right)&&isInit)){
-                            if(right_first==null){
+                    foreach(Edge edge in right_edges){ //找到右側第一個碰到的edge
+                        if(last_side==2) break; //上一次是右側，本次不會是右側
+
+                        if(edge.pointA.Equals(current_right) || (edge.pointB.Equals(current_right)&&endFlag)){ //全部找一遍
+                            PointF edge_intersection = calMath.getIntersection(edge, current_edge);
+                            if(edge_intersection.Y > Math.Max(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
+                                continue;
+                            if(edge_intersection.Y < Math.Min(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
+                                continue;
+                            if(edge_intersection.Y > current_edge.edgePA.Y) //找到回頭點，跳過
+                                continue;
+
+                            if(edge_intersection.Y > right_intersection.Y){
                                 right_first = edge;
-                                right_intersection = calMath.getIntersection(edge, current_edge);
-                            }
-                            else{
-                                PointF edge_intersection = calMath.getIntersection(edge, current_edge);
-                                if(edge_intersection.Y > right_intersection.Y){
-                                    right_first = edge;
-                                    right_intersection = edge_intersection;
-                                }
+                                right_intersection = edge_intersection;
                             }
                         }
                     }
-                    
+
                     PointF intersection;
-                    if(left_intersection.Y > right_intersection.Y){
+                    int end_side = 0; //若結束點又再碰到線，紀錄碰到哪邊的線
+                    if(left_intersection.Y > right_intersection.Y || last_side==2){ //判斷先交右側還是左側
                         intersection = left_intersection;
-                        if(!current_left.Equals(end_left)){
-                            if(left_first.pointA.Y < left_first.pointB.Y)
-                                current_left = left_first.pointA;
-                            else
-                                current_left = left_first.pointB;
+                        if(!current_left.Equals(end_left)){ //左側找到結束點(不用再交換了)
+                            current_left = left_first.pointB;
                         }
-                        left_edges.Remove(left_first);
+                        else{
+                            if(start_left.Equals(end_left)){ //例外情況，起點和終點一樣
+                                //重新設置終點
+                                current_left = left_first.pointB;
+                                end_left = current_left;
+                            }
+                            if(endFlag && !intersection.Equals(new PointF())){ //終點又碰到線段
+                                end_side = 1;
+                            }
+                        }
+                        remove_edge.Add(calMath.getModifyEdge(left_first, intersection));
+                        last_side = 1;
                     }
                     else{
                         intersection = right_intersection;
-                        if(!current_right.Equals(end_right)){
-                            if(right_first.pointA.Y < right_first.pointB.Y)
-                                current_left = right_first.pointA;
-                            else
-                                current_right = right_first.pointB;
+                        if(!current_right.Equals(end_right)){ //右側找到結束點(不用再交換了)
+                            current_right = right_first.pointB;
                         }
-                        right_edges.Remove(right_first);
+                        else{
+                            if(start_right.Equals(end_right)){ //例外情況，起點和終點一樣
+                                //重新設置終點
+                                current_right = right_first.pointB;
+                                end_right = current_right;
+                            }
+                            if(endFlag && !intersection.Equals(new PointF())){ //終點又碰到線段
+                                end_side = 2;
+                            }
+                        }
+                        remove_edge.Add(calMath.getModifyEdge(right_first, intersection));
+                        last_side = 2;
                     }
-                    if(current_edge.edgePA.Y < current_edge.edgePB.Y)
-                        current_edge.edgePA = intersection;
-                    else
-                        current_edge.edgePB = intersection;
 
-                    isInit = false;
+                    if(endFlag){
+                        if(end_side!=0){
+                            all_PE.hyper_list.Last().edgePB = intersection;
+
+                            if(end_side==1){
+                                current_left = left_first.pointA;
+                                current_edge = calMath.getVoronoiEdge(current_left, current_right);
+                                current_edge.edgePA = intersection;
+                            }
+                            else{
+                                current_right = right_first.pointA;
+                                current_edge = calMath.getVoronoiEdge(current_left, current_right);
+                                current_edge.edgePA = intersection;
+                            }
+                            all_PE.hyper_list.Add((Edge)current_edge.getClone());
+                        }
+                        
+                        break;
+                    }
+
+                    Console.WriteLine("Current Hyper:"+current_edge.edgePA+current_edge.edgePB);
+
+                    //修正hyper plane長度
+                    current_edge.edgePB = intersection;
                     all_PE.hyper_list.Add((Edge)current_edge.getClone());
-                    if(current_left.Equals(end_left) && current_right.Equals(end_right)) break;
 
                     current_edge = calMath.getVoronoiEdge(current_left, current_right);
-                    if(current_edge.edgePA.Y < current_edge.edgePB.Y)
-                        current_edge.edgePB = intersection;
-                    else
-                        current_edge.edgePA = intersection;
-                    //all_PE.hyper_list.Add((Edge)current_edge.getClone());
-                    
+                    current_edge.edgePA = intersection;
+
+                    Console.WriteLine("左交點: "+left_intersection);
+                    Console.WriteLine("右交點: "+right_intersection);
+                    Console.WriteLine("Edge Point:"+left_first.pointA+left_first.pointB);
+                    Console.WriteLine("交點:"+intersection);
+                    Console.WriteLine("Current left:"+current_left);
+                    Console.WriteLine("Current right:"+current_right);
+                    Console.WriteLine("Next Hyper:"+current_edge.edgePA+current_edge.edgePB);
+                    Console.WriteLine();
                 }
 
                 //eL.Add(bottom_edge);
+                addToBuffer(left_PE, right_PE, (PointEdgeRecoder)all_PE.getClone());
+
+                //紀錄結果和Hyper Plane
+                all_PE.edges_list = remove_edge;
                 all_PE.edges_list.AddRange(left_edges);
                 all_PE.edges_list.AddRange(right_edges);
-                addToBuffer(all_PE);
+                addToBuffer((PointEdgeRecoder) all_PE.getClone());
+
+                //最終結果存入buffer
+                all_PE.edges_list.AddRange(all_PE.hyper_list);
+                all_PE.hyper_list = new List<Edge>();
+                addToBuffer((PointEdgeRecoder) all_PE.getClone());
+
                 return all_PE;
             }
         }
@@ -240,6 +292,14 @@ namespace VoronoiDiagram
             List<PointEdgeRecoder> PE_recoder = new List<PointEdgeRecoder>();
             PE_recoder.Add((PointEdgeRecoder) recoder1.getClone());
             PE_recoder.Add((PointEdgeRecoder) recoder2.getClone());
+            recoder_buffer.Enqueue(PE_recoder);
+        }
+
+        private void addToBuffer(PointEdgeRecoder recoder1, PointEdgeRecoder recoder2, PointEdgeRecoder recoder3){
+            List<PointEdgeRecoder> PE_recoder = new List<PointEdgeRecoder>();
+            PE_recoder.Add((PointEdgeRecoder) recoder1.getClone());
+            PE_recoder.Add((PointEdgeRecoder) recoder2.getClone());
+            PE_recoder.Add((PointEdgeRecoder) recoder3.getClone());
             recoder_buffer.Enqueue(PE_recoder);
         }
     }

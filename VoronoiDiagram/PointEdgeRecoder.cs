@@ -34,6 +34,7 @@ namespace VoronoiDiagram
         public PointF edgePA, edgePB; //紀錄邊的兩點
         public PointF pointA, pointB; //製作該edge的兩點
 
+        public Edge(){}
         public Edge(PointF edgePA, PointF edgePB, PointF pointA, PointF pointB){
             this.edgePA = edgePA;
             this.edgePB = edgePB;
@@ -60,6 +61,13 @@ namespace VoronoiDiagram
                 PointF temp = edgePA;
                 edgePA = edgePB;
                 edgePB = temp;
+            }
+            else if(edgePA.Y == edgePB.Y){
+                if(edgePA.X > edgePB.X){
+                    PointF temp = edgePA;
+                    edgePA = edgePB;
+                    edgePB = temp;
+                }
             }
         }
 

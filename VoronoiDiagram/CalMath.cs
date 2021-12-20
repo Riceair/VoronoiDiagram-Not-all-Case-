@@ -93,18 +93,51 @@ namespace VoronoiDiagram
             return convex_eList;
         }
 
-        public Edge getPointDiffSideEdge(List<Edge> ch_edges, List<PointF> points){ //只要檢查出一點在左，一點不在左即可
+        public Edge getModifyEdge(Edge edge, PointF intersection_point){ //取得經Hyper Plane修正過的Edge
+            PointF mid = getCenterPoint(edge.pointA, edge.pointB); //合成Edge兩點的中心點
+            PointF ip_vec = getVector(mid, intersection_point); //交點與mid的向量
+            PointF eA_vec = getVector(mid, edge.edgePA); //Edge的PA與mid的向量
+            
+            // Console.WriteLine("Edge Point: "+edge.pointA+edge.pointB);
+            // Console.WriteLine("中點: "+mid);
+            // Console.WriteLine("PA: "+edge.edgePA);
+            // Console.WriteLine("交點: "+intersection_point);
+            // Console.WriteLine("交點與中點向量: "+ip_vec);
+            // Console.WriteLine("PA與中點向量: "+eA_vec);
+            // Console.WriteLine();
+
+            if(ip_vec.X*eA_vec.Y+ip_vec.Y*eA_vec.X == 0) return edge; //兩向量平行->兩垂線互相垂直
+
+            if(ip_vec.X*eA_vec.X>0 && ip_vec.Y*eA_vec.Y>0){//表示PA和交點對於mid同方向 -> PA要改成交點
+                edge.edgePA = intersection_point;
+            }
+            else{
+                edge.edgePB = intersection_point;
+            }
+
+            return edge;
+        }
+
+        public float getDot(PointF o, PointF a, PointF b){ //取得點積
+            return (a.X-o.X) * (b.X-o.X) + (a.Y-o.Y) * (b.Y-o.Y);
+        }
+
+        public bool isPointInEdge(PointF point, Edge edge){ //檢查點是否共線且在edge內
+            return getCrossProduct(point, edge.edgePA, edge.edgePB)==0 && getDot(point, edge.edgePA, edge.edgePB) < 0;
+        }
+
+        public Edge getPointDiffSideEdge(List<Edge> ch_edges, List<PointF> left_points, List<PointF> right_points){ //只要檢查出一點在左，一點不在左即可
             int edge_idx = -1;
             for(int i = 0;i<ch_edges.Count;i++){
                 bool isPAFind = false, isPBFind = false;
-                foreach(PointF point in points){
+                foreach(PointF point in left_points){
                     if(ch_edges[i].edgePA.Equals(point)){ //edgePA在左側
                         isPAFind = true;
                         break;
                     }
                 }
 
-                foreach(PointF point in points){
+                foreach(PointF point in left_points){
                     if(ch_edges[i].edgePB.Equals(point)){ //edgePB在左側
                         isPBFind = true;
                         break;
@@ -116,7 +149,27 @@ namespace VoronoiDiagram
                     break;
                 }
             }
-            return ch_edges[edge_idx];
+            
+            Edge ch_edge = (Edge) ch_edges[edge_idx].getClone();
+            foreach(PointF point in left_points){
+                if(isPointInEdge(point, ch_edge)){ //點在跨線點上，表示在左側的值要更新
+                    if(ch_edge.edgePA.X < ch_edge.edgePB.X)
+                        ch_edge.edgePA = point;
+                    else
+                        ch_edge.edgePB = point;
+                }
+            }
+
+            foreach(PointF point in right_points){
+                if(isPointInEdge(point, ch_edge)){ //點在跨線點上，表示在右側的值要更新
+                    if(ch_edge.edgePA.X > ch_edge.edgePB.X)
+                        ch_edge.edgePA = point;
+                    else
+                        ch_edge.edgePB = point;
+                }
+            }
+
+            return ch_edge;
         }
 
         public List<PointF> getCounterClockwiseSortPoints(List<PointF> pList){ //取得逆時鐘排好的點
@@ -199,7 +252,11 @@ namespace VoronoiDiagram
             float cross_ab = a.X*b.Y - a.Y*b.X;
             a.X = a.X*cross_sb/cross_ab;
             a.Y = a.Y*cross_sb/cross_ab;
-            return new PointF(edge1.edgePA.X+a.X, edge1.edgePA.Y+a.Y);
+
+            PointF intersection = new PointF(edge1.edgePA.X+a.X, edge1.edgePA.Y+a.Y);
+            intersection.X = (float) Math.Round(intersection.X, 2, MidpointRounding.AwayFromZero);
+            intersection.Y = (float) Math.Round(intersection.Y, 2, MidpointRounding.AwayFromZero);
+            return intersection;
         }
         
         public float getPointDistance(PointF point1, PointF point2){ //運算兩點距離
@@ -212,42 +269,6 @@ namespace VoronoiDiagram
         public PointF multPoints(PointF point1, float times){
             return new PointF(point1.X*times, point1.Y*times);
         }
-
-        /*
-        確認兩線段是否有交點
-        //https://blog.iphpo.com/blog/2018/12/%E5%88%A4%E6%96%B7%E5%85%A9%E7%B7%9A%E6%96%B7%E7%9B%B8%E4%BA%A4/
-        */
-        private bool isPointIntersection(PointF p, PointF p1, PointF p2){
-            return p.X >= Math.Min(p1.X, p2.X)
-                && p.X <= Math.Max(p1.X, p2.X)
-                && p.Y >= Math.Min(p1.Y, p2.Y)
-                && p.Y <= Math.Max(p1.Y, p2.Y);
-        }
-
-        public bool isIntersection(Edge edge1, Edge edge2){ //檢查兩線段是否相交
-            PointF A = edge1.edgePA, B = edge1.edgePB, C = edge2.edgePA, D = edge2.edgePB;
-            if(
-                Math.Max(A.X, B.X) < Math.Min(C.X, D.X) ||
-                Math.Max(A.Y, B.Y) < Math.Min(C.Y, D.Y) ||
-                Math.Max(C.X, D.X) < Math.Min(A.X, B.X) ||
-                Math.Max(C.Y, D.Y) < Math.Min(A.Y, B.Y)
-            ) return false;
-
-            float c1 = getCrossProduct(A, B, C);
-            float c2 = getCrossProduct(A, B, D);
-            float c3 = getCrossProduct(C, D, A);
-            float c4 = getCrossProduct(C, D, B);
-
-            if(c1*c2<0 || c3*c4<0) return true;
-
-            if(c1==0) return isPointIntersection(C, A, B);
-            if(c2==0) return isPointIntersection(D, A, B);
-            if(c3==0) return isPointIntersection(A, C, D);
-            if(c4==0) return isPointIntersection(B, C, D);
-
-            return false;
-        }
-        //確認兩線段是否有交點
 
     }
 }
