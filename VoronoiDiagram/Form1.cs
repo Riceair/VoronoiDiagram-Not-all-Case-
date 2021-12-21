@@ -162,6 +162,7 @@ namespace VoronoiDiagram
 
         private void stepToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if(points_list.Count==0) return;
             if(!isRunAll || record_buffer.Count == 0){
                 isReadOnly = true;
                 isRunAll = true;
@@ -186,6 +187,7 @@ namespace VoronoiDiagram
         }
         private void runToolStripMenuItem_Click(object sender, EventArgs e) //跑執行全部
         {
+            if(points_list.Count==0) return;
             isReadOnly = true;
             isRunAll = true;
             record_buffer.Clear();

@@ -75,8 +75,20 @@ namespace VoronoiDiagram
             }
             else{
                 //左右兩邊分別跑VoronoiDiagram遞迴
-                PointEdgeRecoder left_PE = runVoronoiDiagram(pList.GetRange(0, pList.Count/2));
-                PointEdgeRecoder right_PE = runVoronoiDiagram(pList.GetRange(pList.Count/2, pList.Count - pList.Count/2));
+                PointEdgeRecoder left_PE, right_PE;
+                if(count == 5){ //若有5個點，看中間那個點離左邊還右邊較近就分過去(這樣分較為合理)
+                    int split_count;
+                    if(calMath.getPointDistance(pList[1], pList[2]) < calMath.getPointDistance(pList[2], pList[3]))
+                        split_count = 3;
+                    else split_count = 2;
+                    
+                    left_PE = runVoronoiDiagram(pList.GetRange(0, split_count));
+                    right_PE = runVoronoiDiagram(pList.GetRange(split_count, pList.Count - split_count));
+                }
+                else{
+                    left_PE = runVoronoiDiagram(pList.GetRange(0, pList.Count/2));
+                    right_PE = runVoronoiDiagram(pList.GetRange(pList.Count/2, pList.Count - pList.Count/2));
+                }
 
                 //存Buffer
                 //取得左右邊的convex hull
@@ -128,13 +140,13 @@ namespace VoronoiDiagram
 
                 PointF current_left = start_left, current_right = start_right;
                 Edge current_edge = hyper_voronoi_edge;
-                List<Edge> remove_edge = new List<Edge>(); //儲存已經處理過的Edge
+                List<ModifyEdge> modify_edges = new List<ModifyEdge>(); //儲存要修改的Edge
 
                 //畫hyper plane
                 bool endFlag = false; //標記結束
                 int last_side = 0; //紀錄上一次是碰到哪一邊
 
-                for(int c=0;c<pList.Count;c++){ //用所有點的數當迴圈數，避免bug卡住
+                for(int c=0;c<count;c++){ //用所有點的數當迴圈數，避免bug卡住
                     if(current_left.Equals(end_left) && current_right.Equals(end_right)){
                         all_PE.hyper_list.Add((Edge)current_edge.getClone());
                         endFlag = true;
@@ -142,48 +154,74 @@ namespace VoronoiDiagram
 
                     Edge left_first = new Edge(); //紀錄hyper plane第一個碰到的edge
                     PointF left_intersection = new PointF(); //紀錄交點
+                    Edge left_temp_edge = new Edge(); //例外情況處理
+                    PointF left_temp_intersection = new PointF();
+                    bool isLeftFound = false;
                     foreach(Edge edge in left_edges){ //找到左側第一個碰到的edge
-                        if(last_side==1) break; //上一次是左側，本次不會是左側
+                        if(last_side==1 && endFlag) break; //最後一次的上一次是左側，本次不會是左側
+
+                        PointF edge_intersection = calMath.getIntersection(edge, current_edge);
+                        if(edge_intersection.Y > Math.Max(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
+                            continue;
+                        if(edge_intersection.Y < Math.Min(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
+                            continue;
+                        if(edge_intersection.Y > current_edge.edgePA.Y) //找到回頭點，跳過
+                            continue;
 
                         if(edge.pointA.Equals(current_left) || (edge.pointB.Equals(current_left)&&endFlag)){ //全部找一遍
-                            PointF edge_intersection = calMath.getIntersection(edge, current_edge);
-                            if(edge_intersection.Y > Math.Max(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
-                                continue;
-                            if(edge_intersection.Y < Math.Min(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
-                                continue;
-                            if(edge_intersection.Y > current_edge.edgePA.Y) //找到回頭點，跳過
-                                continue;
-
                             if(edge_intersection.Y > left_intersection.Y){
                                 left_first = edge;
                                 left_intersection = edge_intersection;
+                                isLeftFound = true;
                             }
+                        }
+
+                        if(edge_intersection.Y > left_intersection.Y && edge_intersection.Y != current_edge.edgePA.Y){
+                            left_temp_edge = edge;
+                            left_temp_intersection = edge_intersection;
                         }
                     }
 
                     Edge right_first = new Edge(); //紀錄hyper plane第一個碰到的edge
                     PointF right_intersection = new PointF(); //紀錄交點
+                    Edge right_temp_edge = new Edge(); //例外情況處理
+                    PointF right_temp_intersection = new PointF();
+                    bool isRightFound = false;
                     foreach(Edge edge in right_edges){ //找到右側第一個碰到的edge
-                        if(last_side==2) break; //上一次是右側，本次不會是右側
+                        if(last_side==2 && endFlag) break; //最後一次的上一次是右側，本次不會是右側
+
+                        PointF edge_intersection = calMath.getIntersection(edge, current_edge);
+                        if(edge_intersection.Y > Math.Max(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
+                            continue;
+                        if(edge_intersection.Y < Math.Min(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
+                            continue;
+                        if(edge_intersection.Y > current_edge.edgePA.Y) //找到回頭點，跳過
+                            continue;
 
                         if(edge.pointA.Equals(current_right) || (edge.pointB.Equals(current_right)&&endFlag)){ //全部找一遍
-                            PointF edge_intersection = calMath.getIntersection(edge, current_edge);
-                            if(edge_intersection.Y > Math.Max(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
-                                continue;
-                            if(edge_intersection.Y < Math.Min(edge.edgePA.Y, edge.edgePB.Y)) //交點不在edge上，表示實際上沒交點
-                                continue;
-                            if(edge_intersection.Y > current_edge.edgePA.Y) //找到回頭點，跳過
-                                continue;
-
                             if(edge_intersection.Y > right_intersection.Y){
                                 right_first = edge;
                                 right_intersection = edge_intersection;
+                                isRightFound = true;
                             }
+                        }
+
+                        if(edge_intersection.Y > right_intersection.Y && edge_intersection.Y != current_edge.edgePA.Y){
+                            right_temp_edge = edge;
+                            right_temp_intersection = edge_intersection;
                         }
                     }
 
                     PointF intersection;
                     int end_side = 0; //若結束點又再碰到線，紀錄碰到哪邊的線
+                    if(!isLeftFound && !isRightFound){
+                        Console.WriteLine("WTF");
+                        left_intersection = left_temp_intersection;
+                        left_first = left_temp_edge;
+                        right_intersection = right_temp_intersection;
+                        right_first = right_temp_edge;
+                    }
+
                     if(left_intersection.Equals(right_intersection)){
                         intersection = left_intersection;
                         if(!current_left.Equals(end_left)){
@@ -193,7 +231,7 @@ namespace VoronoiDiagram
                             current_right = right_first.pointB;
                         }
                     }
-                    else if(left_intersection.Y > right_intersection.Y || last_side==2){ //判斷先交右側還是左側
+                    else if(left_intersection.Y > right_intersection.Y){ //判斷先交右側還是左側
                         intersection = left_intersection;
                         if(!current_left.Equals(end_left)){ //左側找到結束點(不用再交換了)
                             current_left = left_first.pointB;
@@ -208,7 +246,7 @@ namespace VoronoiDiagram
                                 end_side = 1;
                             }
                         }
-                        remove_edge.Add(calMath.getModifyEdge(left_first, intersection));
+                        modify_edges.Add(new ModifyEdge(left_first, intersection));
                         last_side = 1;
                     }
                     else{
@@ -226,12 +264,12 @@ namespace VoronoiDiagram
                                 end_side = 2;
                             }
                         }
-                        remove_edge.Add(calMath.getModifyEdge(right_first, intersection));
+                        modify_edges.Add(new ModifyEdge(right_first, intersection));
                         last_side = 2;
                     }
 
                     if(endFlag){
-                        if(end_side!=0){
+                        if(end_side!=0){ //若終止線還有碰到其他線
                             all_PE.hyper_list.Last().edgePB = intersection;
 
                             if(end_side==1){
@@ -246,7 +284,6 @@ namespace VoronoiDiagram
                             }
                             all_PE.hyper_list.Add((Edge)current_edge.getClone());
                         }
-                        
                         break;
                     }
 
@@ -273,9 +310,8 @@ namespace VoronoiDiagram
                 addToBuffer(left_PE, right_PE, (PointEdgeRecoder)all_PE.getClone());
 
                 //紀錄結果和Hyper Plane
-                all_PE.edges_list = remove_edge;
-                all_PE.edges_list.AddRange(left_edges);
-                all_PE.edges_list.AddRange(right_edges);
+                List<Edge> m_eList = calMath.getModifyEdges(modify_edges, all_PE.hyper_list);
+                all_PE.edges_list = m_eList;
                 addToBuffer((PointEdgeRecoder) all_PE.getClone());
 
                 //最終結果存入buffer

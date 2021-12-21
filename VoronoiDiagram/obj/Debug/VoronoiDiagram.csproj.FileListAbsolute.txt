@@ -7,4 +7,4 @@ C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csp
 C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csproj.CoreCompileInputs.cache
 C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.exe
 C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.pdb
-C:\Users\user\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csprojAssemblyReference.cache
+C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csproj.AssemblyReference.cache

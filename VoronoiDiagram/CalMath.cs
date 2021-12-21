@@ -93,29 +93,22 @@ namespace VoronoiDiagram
             return convex_eList;
         }
 
-        public Edge getModifyEdge(Edge edge, PointF intersection_point){ //取得經Hyper Plane修正過的Edge
-            PointF mid = getCenterPoint(edge.pointA, edge.pointB); //合成Edge兩點的中心點
-            PointF ip_vec = getVector(mid, intersection_point); //交點與mid的向量
-            PointF eA_vec = getVector(mid, edge.edgePA); //Edge的PA與mid的向量
-            
-            // Console.WriteLine("Edge Point: "+edge.pointA+edge.pointB);
-            // Console.WriteLine("中點: "+mid);
-            // Console.WriteLine("PA: "+edge.edgePA);
-            // Console.WriteLine("交點: "+intersection_point);
-            // Console.WriteLine("交點與中點向量: "+ip_vec);
-            // Console.WriteLine("PA與中點向量: "+eA_vec);
-            // Console.WriteLine();
+        public List<Edge> getModifyEdges(List<ModifyEdge> modify_edges, List<Edge> hyper_list){ //取得經Hyper Plane修正過的Edge
+            for(int i=0;i<modify_edges.Count;i++){
+                float pA_cross = getCrossProduct(modify_edges[i].intersection, hyper_list[i].edgePA, modify_edges[i].edge.edgePA); //取得與edagePA的叉積
+                float hyper_cross = getCrossProduct(modify_edges[i].intersection, hyper_list[i].edgePA, hyper_list[i+1].edgePB);
 
-            if(ip_vec.X*eA_vec.Y+ip_vec.Y*eA_vec.X == 0) return edge; //兩向量平行->兩垂線互相垂直
-
-            if(ip_vec.X*eA_vec.X>0 && ip_vec.Y*eA_vec.Y>0){//表示PA和交點對於mid同方向 -> PA要改成交點
-                edge.edgePA = intersection_point;
+                if(pA_cross*hyper_cross>0) //要消的線地方為和下一個hyper plane向量同方向的向量
+                    modify_edges[i].edge.edgePA = modify_edges[i].intersection;
+                else
+                    modify_edges[i].edge.edgePB = modify_edges[i].intersection;
             }
-            else{
-                edge.edgePB = intersection_point;
+            List<Edge> eList = new List<Edge>();
+            foreach(ModifyEdge modify_edge in modify_edges){
+                eList.Add(modify_edge.edge);
             }
 
-            return edge;
+            return eList;
         }
 
         public float getDot(PointF o, PointF a, PointF b){ //取得點積

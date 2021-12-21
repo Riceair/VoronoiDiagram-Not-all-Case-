@@ -15,6 +15,8 @@ namespace VoronoiDiagram
         public Color convex_color = Color.SkyBlue;
         public Color hyper_color = Color.SeaGreen;
 
+        public PointEdgeRecoder(){}
+
         public PointEdgeRecoder(List<PointF> pList, List<Edge> eList){
             points_list = pList;
             edges_list = eList;
@@ -90,6 +92,17 @@ namespace VoronoiDiagram
 
         public Object getClone(){
             return this.MemberwiseClone();
+        }
+    }
+
+    public class ModifyEdge: Object //儲存要修改的edge資訊
+    {
+        public Edge edge = new Edge();
+        public PointF intersection = new PointF();
+
+        public ModifyEdge(Edge edge, PointF intersection){
+            this.edge = edge;
+            this.intersection = intersection;
         }
     }
 }
