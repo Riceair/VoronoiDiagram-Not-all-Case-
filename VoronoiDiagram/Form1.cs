@@ -62,7 +62,8 @@ namespace VoronoiDiagram
                 {
                     if(point_count==0)
                     {
-                        point_count = Convert.ToInt32(line);
+                        string no_space_line = line.Replace(" ",String.Empty);
+                        point_count = Convert.ToInt32(no_space_line);
                         if(point_count == 0)
                             break; //若收到的輸入是0，直接break
                         pList = new List<PointF>();
@@ -227,7 +228,8 @@ namespace VoronoiDiagram
             {
                 while ((line = sr.ReadLine()) != null)
                 {
-                    if (line.StartsWith("#") || line.Equals("")) //不處理註解
+                    string no_space_line = line.Replace(" ", String.Empty);
+                    if (no_space_line.StartsWith("#") || no_space_line.Equals("")) //不處理註解
                         continue;
                     input_lines.Add(line); //紀錄輸入
                 }
