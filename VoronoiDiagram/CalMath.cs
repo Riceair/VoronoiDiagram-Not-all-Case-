@@ -111,6 +111,30 @@ namespace VoronoiDiagram
             return eList;
         }
 
+        public List<Edge> getRemoveNoLinkEdges(List<Edge> edges){ //去除完全沒有相交的線
+            List<Edge> no_link_edges = new List<Edge>();
+            for(int i=0;i<edges.Count;i++){
+                bool isFoundIntersection = false;
+                for(int j=0;j<edges.Count;j++){
+                    if(i==j) continue;
+
+                    if(edges[i].edgePA.Equals(edges[j].edgePA) || edges[i].edgePA.Equals(edges[j].edgePB)
+                    || edges[i].edgePB.Equals(edges[j].edgePA) || edges[i].edgePB.Equals(edges[j].edgePB)){
+                        isFoundIntersection = true;
+                        break;
+                    }
+                }
+                if(!isFoundIntersection)
+                    no_link_edges.Add(edges[i]);
+            }
+
+            foreach(Edge no_link_edge in no_link_edges){
+                edges.Remove(no_link_edge);
+            }
+
+            return edges;
+        }
+
         public float getDot(PointF o, PointF a, PointF b){ //取得點積
             return (a.X-o.X) * (b.X-o.X) + (a.Y-o.Y) * (b.Y-o.Y);
         }
