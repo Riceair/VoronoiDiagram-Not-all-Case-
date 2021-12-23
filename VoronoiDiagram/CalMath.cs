@@ -93,39 +93,50 @@ namespace VoronoiDiagram
             return convex_eList;
         }
 
-        public List<Edge> getModifyEdges(List<ModifyEdge> modify_edges, List<Edge> hyper_list){ //取得經Hyper Plane修正過的Edge
+        public List<Edge> getModifyEdges(List<Edge> modify_edges, List<Edge> hyper_list){ //取得經Hyper Plane修正過的Edge
             for(int i=0;i<modify_edges.Count;i++){
-                float pA_cross = getCrossProduct(modify_edges[i].intersection, hyper_list[i].edgePA, modify_edges[i].edge.edgePA); //取得與edagePA的叉積
-                float hyper_cross = getCrossProduct(modify_edges[i].intersection, hyper_list[i].edgePA, hyper_list[i+1].edgePB);
+                float pA_cross = getCrossProduct(hyper_list[i].edgePB, hyper_list[i].edgePA, modify_edges[i].edgePA); //取得與edagePA的叉積
+                float hyper_cross = getCrossProduct(hyper_list[i].edgePB, hyper_list[i].edgePA, hyper_list[i+1].edgePB);
 
-                if(pA_cross*hyper_cross>0) //要消的線地方為和下一個hyper plane向量同方向的向量
-                    modify_edges[i].edge.edgePA = modify_edges[i].intersection;
-                else
-                    modify_edges[i].edge.edgePB = modify_edges[i].intersection;
-            }
-            List<Edge> eList = new List<Edge>();
-            foreach(ModifyEdge modify_edge in modify_edges){
-                eList.Add(modify_edge.edge);
+                if(pA_cross*hyper_cross>0){ //要消的線地方為和下一個hyper plane向量同方向的向量
+                    modify_edges[i].edgePA = hyper_list[i].edgePB;
+                }
+                else{
+                    modify_edges[i].edgePB = hyper_list[i].edgePB;
+                }
             }
 
-            return eList;
+            return modify_edges;
         }
 
-        public List<Edge> getRemoveNoLinkEdges(List<Edge> edges){ //去除完全沒有相交的線
+        public List<Edge> getRemoveNoLinkEdges(List<Edge> edges, List<Edge> modify_edges){ //去除完全沒有相交的線
             List<Edge> no_link_edges = new List<Edge>();
             for(int i=0;i<edges.Count;i++){
                 bool isFoundIntersection = false;
                 for(int j=0;j<edges.Count;j++){
                     if(i==j) continue;
 
-                    if(edges[i].edgePA.Equals(edges[j].edgePA) || edges[i].edgePA.Equals(edges[j].edgePB)
-                    || edges[i].edgePB.Equals(edges[j].edgePA) || edges[i].edgePB.Equals(edges[j].edgePB)){
+                    if(edges[i].edgePA.Equals(edges[j].edgePA)
+                    || edges[i].edgePA.Equals(edges[j].edgePB)
+                    || edges[i].edgePB.Equals(edges[j].edgePA)
+                    || edges[i].edgePB.Equals(edges[j].edgePB)){
                         isFoundIntersection = true;
                         break;
                     }
                 }
-                if(!isFoundIntersection)
-                    no_link_edges.Add(edges[i]);
+                if(!isFoundIntersection){
+                    bool isModifyEdge = false;
+                    foreach(Edge m_edge in modify_edges){
+                        if(edges[i].Equals(m_edge)){
+                            isModifyEdge = true;
+                            break;
+                        }
+                    }
+                    
+                    if(!isModifyEdge){
+                        no_link_edges.Add(edges[i]);
+                    }
+                }
             }
 
             foreach(Edge no_link_edge in no_link_edges){
@@ -271,8 +282,8 @@ namespace VoronoiDiagram
             a.Y = a.Y*cross_sb/cross_ab;
 
             PointF intersection = new PointF(edge1.edgePA.X+a.X, edge1.edgePA.Y+a.Y);
-            intersection.X = (float) Math.Round(intersection.X, 2, MidpointRounding.AwayFromZero);
-            intersection.Y = (float) Math.Round(intersection.Y, 2, MidpointRounding.AwayFromZero);
+            intersection.X = (float) Math.Round(intersection.X, 1);
+            intersection.Y = (float) Math.Round(intersection.Y, 1);
             return intersection;
         }
         

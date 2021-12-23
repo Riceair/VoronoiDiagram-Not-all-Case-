@@ -55,6 +55,8 @@ namespace VoronoiDiagram
                 openFileDialog1.Title = "Open Input";
                 if (openFileDialog1.ShowDialog() == DialogResult.OK) //取得選擇的檔名
                     readFile(openFileDialog1.FileName);
+                else
+                    return;
 
                 int point_count = 0; //紀錄輸入點數目
                 List<PointF> pList = new List<PointF>();
@@ -96,6 +98,8 @@ namespace VoronoiDiagram
                 openFileDialog1.Title = "Open Output";
                 if (openFileDialog1.ShowDialog() == DialogResult.OK) //取得選擇的檔名
                     readFile(openFileDialog1.FileName);
+                else
+                    return;
 
                 List<PointF> pList = new List<PointF>();
                 List<Edge> eList = new List<Edge>();
