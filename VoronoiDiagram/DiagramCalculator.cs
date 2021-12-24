@@ -119,7 +119,7 @@ namespace VoronoiDiagram
                 //複製右側的邊
                 List<Edge> right_edges = right_PE.edges_list.ConvertAll(edge => (Edge) edge.getClone());
 
-                PointF start_left, start_right, end_left, end_right; //儲存merge的左右邊開始結束點
+                PointF start_left, start_right; //儲存merge的左右邊開始結束點
                  //確定start point左右側是真的存左右側
                 if(convex_upper_line.edgePA.X < convex_upper_line.edgePB.X){
                     start_left = convex_upper_line.edgePA;
@@ -128,14 +128,6 @@ namespace VoronoiDiagram
                 else{
                     start_left = convex_upper_line.edgePB;
                     start_right = convex_upper_line.edgePA;
-                }
-                if(convex_lower_line.edgePA.X < convex_lower_line.edgePB.X){
-                    end_left = convex_lower_line.edgePA;
-                    end_right = convex_lower_line.edgePB;
-                }
-                else{
-                    end_left = convex_lower_line.edgePB;
-                    end_right = convex_lower_line.edgePA;
                 }
 
                 PointF current_left = start_left, current_right = start_right;
