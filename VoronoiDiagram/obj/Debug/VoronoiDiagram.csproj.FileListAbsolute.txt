@@ -8,3 +8,13 @@ C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csp
 C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.exe
 C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.pdb
 C:\Users\USER\Desktop\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csproj.AssemblyReference.cache
+D:\..碩班資料\碩一\演算法設計與分析\VoronoiDiagram\VoronoiDiagram\bin\Debug\VoronoiDiagram.exe.config
+D:\..碩班資料\碩一\演算法設計與分析\VoronoiDiagram\VoronoiDiagram\bin\Debug\VoronoiDiagram.exe
+D:\..碩班資料\碩一\演算法設計與分析\VoronoiDiagram\VoronoiDiagram\bin\Debug\VoronoiDiagram.pdb
+D:\..碩班資料\碩一\演算法設計與分析\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csproj.AssemblyReference.cache
+D:\..碩班資料\碩一\演算法設計與分析\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.Form1.resources
+D:\..碩班資料\碩一\演算法設計與分析\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.Properties.Resources.resources
+D:\..碩班資料\碩一\演算法設計與分析\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csproj.GenerateResource.cache
+D:\..碩班資料\碩一\演算法設計與分析\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.csproj.CoreCompileInputs.cache
+D:\..碩班資料\碩一\演算法設計與分析\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.exe
+D:\..碩班資料\碩一\演算法設計與分析\VoronoiDiagram\VoronoiDiagram\obj\Debug\VoronoiDiagram.pdb

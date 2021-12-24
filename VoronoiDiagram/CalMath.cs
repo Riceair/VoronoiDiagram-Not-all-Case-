@@ -113,17 +113,37 @@ namespace VoronoiDiagram
             List<Edge> no_link_edges = new List<Edge>();
             for(int i=0;i<edges.Count;i++){
                 bool isFoundIntersection = false;
+                int PA_count = 0; //交於PA點數量
+                int PB_count = 0; //交於PB點數量
                 for(int j=0;j<edges.Count;j++){
                     if(i==j) continue;
 
                     if(edges[i].edgePA.Equals(edges[j].edgePA)
-                    || edges[i].edgePA.Equals(edges[j].edgePB)
-                    || edges[i].edgePB.Equals(edges[j].edgePA)
+                    || edges[i].edgePA.Equals(edges[j].edgePB)){
+                        PA_count++;
+                    }
+                    if(edges[i].edgePB.Equals(edges[j].edgePA)
                     || edges[i].edgePB.Equals(edges[j].edgePB)){
+                        PB_count++;
+                    }
+
+                    if(PA_count>=2 && PB_count>=2){
                         isFoundIntersection = true;
                         break;
                     }
                 }
+
+                if(!isFoundIntersection){
+                    if(PA_count>=2){
+                        if((edges[i].edgePB.X<=0 || edges[i].edgePB.X>=max_number) && PB_count == 0)
+                            isFoundIntersection = true;
+                    }
+                    else if(PB_count>=2){
+                        if((edges[i].edgePA.X<=0 || edges[i].edgePA.X>=max_number) && PA_count == 0)
+                            isFoundIntersection = true;
+                    }
+                }
+
                 if(!isFoundIntersection){
                     bool isModifyEdge = false;
                     foreach(Edge m_edge in modify_edges){
@@ -282,8 +302,8 @@ namespace VoronoiDiagram
             a.Y = a.Y*cross_sb/cross_ab;
 
             PointF intersection = new PointF(edge1.edgePA.X+a.X, edge1.edgePA.Y+a.Y);
-            intersection.X = (float) Math.Round(intersection.X, 1);
-            intersection.Y = (float) Math.Round(intersection.Y, 1);
+            intersection.X = (float) Math.Round(intersection.X, 2);
+            intersection.Y = (float) Math.Round(intersection.Y, 2);
             return intersection;
         }
         
