@@ -102,15 +102,4 @@ namespace VoronoiDiagram
             return this.MemberwiseClone();
         }
     }
-
-    public class ModifyEdge: Object //儲存要修改的edge資訊
-    {
-        public Edge edge = new Edge();
-        public PointF intersection = new PointF();
-
-        public ModifyEdge(Edge edge, PointF intersection){
-            this.edge = edge;
-            this.intersection = intersection;
-        }
-    }
 }
