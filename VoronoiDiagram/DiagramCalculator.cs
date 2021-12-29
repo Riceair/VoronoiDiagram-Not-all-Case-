@@ -1,4 +1,12 @@
-﻿using System;
+﻿/* $LAN=C#$ */
+/*
+	Name: DiagramCalculator.cs
+	Copyright: Copyright © 2021
+	Author: 韓定紘 Ding-Hong, Han
+    Student ID: M103040011
+    Class: 資訊碩一
+*/
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
