@@ -2,5 +2,5 @@
 
 許多Case無法處理
 
-說明網址:
-https://riceair.github.io/VoronoiDiagram.io/index.html
+說明文件網址:
+https://github.com/Riceair/VoronoiDiagram.io
